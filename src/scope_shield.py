@@ -1,24 +1,44 @@
+import argparse
 import json
 from dataclasses import dataclass
 from typing import List
 
 @dataclass
-class FeatureRequest:
-    id: int
-    description: str
-    scope: str
+class ScopeBoundary:
+    module: str
+    todos: List[str]
+    open_issues: List[str]
 
-class ScopeShield:
-    def __init__(self, defined_scope: List[str]):
-        self.defined_scope = defined_scope
+def load_configuration(file_path: str) -> dict:
+    with open(file_path, 'r') as file:
+        return json.load(file)
 
-    def restrict_feature_requests(self, feature_requests: List[FeatureRequest]) -> List[FeatureRequest]:
-        return [request for request in feature_requests if request.scope in self.defined_scope]
+def analyze_scope(configuration: dict) -> List[ScopeBoundary]:
+    scope_boundaries = []
+    for module, module_config in configuration.items():
+        todos = module_config.get('todos', [])
+        open_issues = module_config.get('open_issues', [])
+        scope_boundaries.append(ScopeBoundary(module, todos, open_issues))
+    return scope_boundaries
 
-    def alert_maintainers(self, feature_requests: List[FeatureRequest]) -> List[FeatureRequest]:
-        potential_scope_creep = [request for request in feature_requests if request.scope not in self.defined_scope]
-        if potential_scope_creep:
-            print("Potential scope creep detected:")
-            for request in potential_scope_creep:
-                print(f"Feature request {request.id}: {request.description}")
-        return potential_scope_creep
+def print_summary(scope_boundaries: List[ScopeBoundary]) -> None:
+    print("Detected Scope Boundaries:")
+    for boundary in scope_boundaries:
+        print(f"Module: {boundary.module}")
+        print(f"Todos: {boundary.todos}")
+        print(f"Open Issues: {boundary.open_issues}")
+        print()
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description='Scope Shield')
+    parser.add_argument('--config', help='Path to configuration file')
+    args = parser.parse_args()
+    if args.config:
+        configuration = load_configuration(args.config)
+        scope_boundaries = analyze_scope(configuration)
+        print_summary(scope_boundaries)
+    else:
+        print("Please provide a configuration file")
+
+if __name__ == '__main__':
+    main()
