@@ -1,5 +1,8 @@
 # Scope Shield
-Scope Shield is a tool that helps developers analyze the scope of their projects.
+A Python project for managing project scopes.
 
-## Installation
-To install the dependencies, run the following command:
+## Usage
+To use this project, simply run the tests using `pytest` and then use the `ScopeShield` class to create and manage project scopes.
+
+## Requirements
+This project requires Python 3.8 or later and has no external dependencies.

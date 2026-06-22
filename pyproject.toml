@@ -5,7 +5,8 @@ build-backend = "poetry.masonry.api"
 [tool.poetry]
 name = "scope-shield"
 version = "1.0.0"
-description = "Scope Shield"
+description = ""
+authors = ["Your Name"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
