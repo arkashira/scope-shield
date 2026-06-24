@@ -1,46 +1,25 @@
 from scope_shield import ScopeShield, ProjectScope
 
-def test_create_scope():
-    shield = ScopeShield()
-    scope = shield.create_scope("Test Project", "Test objectives", "Test boundaries")
-    assert scope.name == "Test Project"
-    assert scope.objectives == "Test objectives"
-    assert scope.boundaries == "Test boundaries"
+def test_enforce_scope():
+    project_scope = ProjectScope("1.0", ["change1", "change2"])
+    scope_shield = ScopeShield(project_scope)
+    contributor_changes = ["change1", "change2"]
+    assert scope_shield.enforce_scope(contributor_changes) == True
 
-def test_create_scope_duplicate_name():
-    shield = ScopeShield()
-    shield.create_scope("Test Project", "Test objectives", "Test boundaries")
-    try:
-        shield.create_scope("Test Project", "Test objectives", "Test boundaries")
-        assert False, "Expected ValueError"
-    except ValueError as e:
-        assert str(e) == "Project scope with this name already exists"
+def test_enforce_scope_outside_scope():
+    project_scope = ProjectScope("1.0", ["change1", "change2"])
+    scope_shield = ScopeShield(project_scope)
+    contributor_changes = ["change1", "change3"]
+    assert scope_shield.enforce_scope(contributor_changes) == False
 
-def test_validate_input():
-    shield = ScopeShield()
-    try:
-        shield.validate_input("", "Test objectives", "Test boundaries")
-        assert False, "Expected ValueError"
-    except ValueError as e:
-        assert str(e) == "All fields are required"
+def test_update_scope():
+    project_scope = ProjectScope("1.0", ["change1", "change2"])
+    scope_shield = ScopeShield(project_scope)
+    new_changes = ["change3", "change4"]
+    scope_shield.update_scope(new_changes)
+    assert scope_shield.get_changelog() == ["change1", "change2", "change3", "change4"]
 
-def test_store_scope():
-    shield = ScopeShield()
-    scope = shield.create_scope("Test Project", "Test objectives", "Test boundaries")
-    stored_scope = shield.store_scope(scope)
-    assert stored_scope["name"] == "Test Project"
-    assert stored_scope["objectives"] == "Test objectives"
-    assert stored_scope["boundaries"] == "Test boundaries"
-
-def test_get_scope():
-    shield = ScopeShield()
-    shield.create_scope("Test Project", "Test objectives", "Test boundaries")
-    scope = shield.get_scope("Test Project")
-    assert scope["name"] == "Test Project"
-    assert scope["objectives"] == "Test objectives"
-    assert scope["boundaries"] == "Test boundaries"
-
-def test_get_nonexistent_scope():
-    shield = ScopeShield()
-    scope = shield.get_scope("Nonexistent Project")
-    assert scope is None
+def test_get_changelog():
+    project_scope = ProjectScope("1.0", ["change1", "change2"])
+    scope_shield = ScopeShield(project_scope)
+    assert scope_shield.get_changelog() == ["change1", "change2"]

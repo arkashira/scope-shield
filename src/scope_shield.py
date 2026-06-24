@@ -1,30 +1,24 @@
 import json
 from dataclasses import dataclass
-from typing import Dict
+from typing import List
 
 @dataclass
 class ProjectScope:
-    name: str
-    objectives: str
-    boundaries: str
+    version: str
+    changes: List[str]
 
 class ScopeShield:
-    def __init__(self):
-        self.scopes = {}
+    def __init__(self, project_scope: ProjectScope):
+        self.project_scope = project_scope
 
-    def create_scope(self, name: str, objectives: str, boundaries: str) -> ProjectScope:
-        if name in self.scopes:
-            raise ValueError("Project scope with this name already exists")
-        scope = ProjectScope(name, objectives, boundaries)
-        self.scopes[name] = scope
-        return scope
+    def enforce_scope(self, contributor_changes: List[str]) -> bool:
+        for change in contributor_changes:
+            if change not in self.project_scope.changes:
+                return False
+        return True
 
-    def validate_input(self, name: str, objectives: str, boundaries: str) -> None:
-        if not name or not objectives or not boundaries:
-            raise ValueError("All fields are required")
+    def update_scope(self, new_changes: List[str]) -> None:
+        self.project_scope.changes.extend(new_changes)
 
-    def store_scope(self, scope: ProjectScope) -> Dict:
-        return scope.__dict__
-
-    def get_scope(self, name: str) -> Dict:
-        return self.scopes.get(name).__dict__ if self.scopes.get(name) else None
+    def get_changelog(self) -> List[str]:
+        return self.project_scope.changes
